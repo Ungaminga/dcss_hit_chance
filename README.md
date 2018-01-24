@@ -3,7 +3,7 @@
 WIP: The theory of probability based chance to hit calculator.
 
 Usage: 
-* Download (hit_chance.txt) and add it to your `crawl/settings` directory.
+* Download [hit_chance.txt](hit_chance.txt) and add it to your `crawl/settings` directory.
 
 * Add those lines to init.txt:
 ```
