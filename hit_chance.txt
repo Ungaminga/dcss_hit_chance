@@ -1,207 +1,205 @@
 {
 
 function sum(t)
-	s = 0
-	for _,v in pairs(t) do
-	    s = s + v
-	end
+  s = 0
+  for _,v in pairs(t) do
+    s = s + v
+  end
 
-	return s
+  return s
 end
 
 function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
+  if type(o) == 'table' then
+    local s = '{ '
+    for k,v in pairs(o) do
+      if type(k) ~= 'number' then k = '"'..k..'"' end
+      s = s .. '['..k..'] = ' .. dump(v) .. ','
+    end
+    return s .. '} '
+  else
+  return tostring(o)
+  end
 end
 
 function more_or_equal(attack, ev)
-    more_or_eq = 0
-    less = 0
-    for a,_ in pairs(attack) do
-        for e,_ in pairs(ev) do
-            if a >= e then more_or_eq = more_or_eq + attack[a]*ev[e]
-            else less = less + attack[a]*ev[e] end
-        end
+  more_or_eq = 0
+  less = 0
+  for a,_ in pairs(attack) do
+    for e,_ in pairs(ev) do
+      if a >= e then more_or_eq = more_or_eq + attack[a]*ev[e]
+      else less = less + attack[a]*ev[e] end
     end
-    s = more_or_eq + less
-    return more_or_eq/s
+  end
+  s = more_or_eq + less
+  return more_or_eq/s
 end
 
 function averge(ch)
-    ch2 = {}
-    for k,_ in pairs(ch) do
-        ch2[math.floor(k/2)] = ch[k]
-    end
-    return ch2
+  ch2 = {}
+  for k,_ in pairs(ch) do
+    ch2[math.floor(k/2)] = ch[k]
+  end
+  return ch2
 end
 
 function inc_base(ch, value)
-    ch2 = {}
-    for k,_ in pairs(ch) do
-        ch2[k+value] = ch[k]
-    end
-    return ch2
+  ch2 = {}
+  for k,_ in pairs(ch) do
+    ch2[k+value] = ch[k]
+  end
+  return ch2
 end
 
 function roll_chance(ch)
-    ch2 = {}
-    for i,_ in pairs(ch) do
-        for j = 0, i+1 do
-            k = math.max(0, j-1)
-            if ch2[k] == nil then ch2[k] = ch[i]
-            else ch2[k] = ch2[k] + ch[i] end
-        end
+  ch2 = {}
+  for i,_ in pairs(ch) do
+    for j = 0, i+1 do
+      k = math.max(0, j-1)
+      if ch2[k] == nil then ch2[k] = ch[i]
+      else ch2[k] = ch2[k] + ch[i] end
     end
+  end
 
-    s = sum(ch2)
-    for i,_ in pairs(ch2) do
-        ch2[i]=ch2[i]/s
-    end
+  s = sum(ch2)
+  for i,_ in pairs(ch2) do
+    ch2[i]=ch2[i]/s
+  end
 
-    return ch2
+  return ch2
 end
 
 function calc_chance(skill)
-    whole = math.floor(skill)
-    ch = {}
-    for i=0,whole do
-    	if ch[i] == nil then ch[i] = 1
-		else ch[i] = ch[i] + 1 end
-    end
+  whole = math.floor(skill)
+  ch = {}
+  for i=0,whole do
+    if ch[i] == nil then ch[i] = 1
+    else ch[i] = ch[i] + 1 end
+  end
 
-    fraction = skill - whole
-    if fraction > 0 then
-        ch[whole] = fraction
-    end
+  fraction = skill - whole
+  if fraction > 0 then
+    ch[whole] = fraction
+  end
 
-    s = sum(ch)
-	for k,_ in pairs(ch) do
-        ch[k]=ch[k]/s
-    end
-    if ch == {} then
-    	ch[0] = 1
-    end
-    return ch
+  s = sum(ch)
+  for k,_ in pairs(ch) do
+    ch[k]=ch[k]/s
+  end
+  if ch == {} then
+    ch[0] = 1
+  end
+  return ch
 end
 
 function mult_chances(ch1, ch2)
-    ch3 = {}
-    for i,_ in pairs(ch1) do
-        for j,_ in pairs(ch2) do
-        	if ch3[i+j] == nil then ch3[i+j] = ch1[i]*ch2[j]
-        	else ch3[i+j] = ch3[i+j] + ch1[i]*ch2[j] end
-        end
+  ch3 = {}
+  for i,_ in pairs(ch1) do
+    for j,_ in pairs(ch2) do
+      if ch3[i+j] == nil then ch3[i+j] = ch1[i]*ch2[j]
+      else ch3[i+j] = ch3[i+j] + ch1[i]*ch2[j] end
     end
-    return ch3
+  end
+  return ch3
 end
 
 function calc_armour_penalty(e, a, s)
-	if e > 0 then
-    	return ((40*e*e*(450-10*a)/(5*(s+3)))/450)/20
-	else return 0 end
+  return ((40*e*e*(450-10*a)/(5*(s+3)))/450)/20
 end
     
 function calc_chance_armour(pen)
-    if pen == 0 then return { [0]=1 } end
+  if pen == 0 then return { [0]=1 } end
 
-    ch = {}
-    whole = math.floor(pen)
-    for i = 1, whole+1 do
-		if ch[-i] == nil then ch[-i] = 1 
-			else ch[-i] =  ch[-i] + 1 end
-	end
+  ch = {}
+  whole = math.floor(pen)
+  for i = 1, whole+1 do
+    if ch[-i] == nil then ch[-i] = 1 
+    else ch[-i] =  ch[-i] + 1 end
+  end
     
-    fraction = pen - whole
-    if fraction == 0 then
-        ch[-whole-1] = fraction
-    end
+  fraction = pen - whole
+  if fraction == 0 then
+    ch[-whole-1] = fraction
+  end
 
-    s = sum(ch)
-    for i,_ in pairs(ch) do
-        ch[i] = ch[i] / s
-    end
+  s = sum(ch)
+  for i,_ in pairs(ch) do
+    ch[i] = ch[i] / s
+  end
 
-    if ch == {} then ch[0] = 1 end
+  if ch == {} then ch[0] = 1 end
     
-    return ch
+  return ch
 end
 
 function HitChance()
-	if crawl.regex("(\(weapon\))|empty-handed|finish taking off|finish putting on"):matches(crawl.messages(1)) == false 
-	or you.feel_safe() == false then
-		return
-	end
-	basevalue = 15
+  if crawl.regex("(\(weapon\))|empty-handed|finish taking off|finish putting on"):matches(crawl.messages(1)) == false 
+  or you.feel_safe() == false then
+    return
+  end
+  basevalue = 15
 
-	dexterity = you.dexterity()
-	strength = you.strength()
+  dexterity = you.dexterity()
+  strength = you.strength()
 
-	fighting = you.skill("Fighting")
-	f_ch = calc_chance(fighting)
+  fighting = you.skill("Fighting")
+  f_ch = calc_chance(fighting)
 
-	armour = you.skill("Armour")
-	e_rating = 0
-	a1 = items.equipped_at("Armour")
-	if a1 then
-		e_rating = a1.encumbrance
-	end
+  armour = you.skill("Armour")
+  e_rating = 0
+  a1 = items.equipped_at("Armour")
+  if a1 then
+    e_rating = a1.encumbrance
+  end
 
-	weapon = 0
-	accuracy = 0
+  weapon = 0
+  accuracy = 0
 
-	w = items.equipped_at("Weapon")
-	if w == nil then
-		weapon = you.skill("Unarmed")
-		accuracy = 2 --TODO: Claws
-	else
-		weapon = you.skill(w.weap_skill)
-		accuracy = w.accuracy + w.plus
-	end
+  w = items.equipped_at("Weapon")
+  if w == nil then
+    weapon = you.skill("Unarmed")
+    accuracy = 2 --TODO: Claws
+  else
+    weapon = you.skill(w.weap_skill)
+    accuracy = w.accuracy + w.plus
+  end
 
-	w_ch = calc_chance(weapon)
-	m_ch = mult_chances(f_ch, w_ch)
+  w_ch = calc_chance(weapon)
+  m_ch = mult_chances(f_ch, w_ch)
 
-	e_penalty = calc_armour_penalty(e_rating, armour, strength)
-	e_ch = calc_chance_armour(e_penalty)
+  e_penalty = calc_armour_penalty(e_rating, armour, strength)
+  e_ch = calc_chance_armour(e_penalty)
 
-	m_ch = mult_chances(m_ch, e_ch)
+  m_ch = mult_chances(m_ch, e_ch)
 
-	w = items.equipped_at("Shield")
-	if w then 
-		shields = you.skill("Shields")
-		size = 0
-		if you.race == "Spriggan" 								then size = 4 
-		elseif you.race == "Kobold" or you.race == "Halfling" 	then size = 2 
-		elseif you.race == "Centaur" or you.race == "Naga" 
-			or you.race == "Formicid" or you.race == "Ogre" 
-			or you.race == "Troll" then size = -2
-		end
-    ev_penalty = w.encumbrance
+  s = items.equipped_at("Shield")
+  if s then 
+    shields = you.skill("Shields")
+    size = 0
+    if you.race == "Spriggan"                 then size = 4 
+    elseif you.race == "Kobold" or you.race == "Halfling"   then size = 2 
+    elseif you.race == "Centaur" or you.race == "Naga" 
+      or you.race == "Formicid" or you.race == "Ogre" 
+      or you.race == "Troll" then size = -2
+    end
+    ev_penalty = s.encumbrance
     s_hit_penalty = ev_penalty - (shields)/(5 + size)
     sh_ch = calc_chance_armour(s_hit_penalty)
     m_ch = mult_chances(m_ch, sh_ch)
-	end
+  end
 
-	basevalue = basevalue + math.floor(dexterity/2) + accuracy
-	inc_v = inc_base(m_ch, basevalue)
+  basevalue = basevalue + math.floor(dexterity/2) + accuracy
+  inc_v = inc_base(m_ch, basevalue)
 
-	roll_c = roll_chance(inc_v)
+  roll_c = roll_chance(inc_v)
 
-	ev = 12
-	ev_ch = averge(mult_chances(calc_chance(2*ev), calc_chance(2*ev)))
+  ev = 12
+  ev_ch = averge(mult_chances(calc_chance(2*ev), calc_chance(2*ev)))
 
-	hit = more_or_equal(roll_c, ev_ch)
-	
-	w_name = "Unarmed"
-	if w then w_name = w.name() end
-	crawl.mpr("<lightcyan>Chance to hit with ".. w_name.." is "..tostring(math.floor(hit*1000)/10).."%</lightcyan>")
+  hit = more_or_equal(roll_c, ev_ch)
+  
+  w_name = "Unarmed"
+  if w then w_name = w.name() end
+  crawl.mpr("<lightcyan>Chance to hit with ".. w_name.." is "..tostring(math.floor(hit*1000)/10).."%</lightcyan>")
 end
 }
