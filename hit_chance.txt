@@ -136,7 +136,7 @@ end
 
 function HitChance()
 	if crawl.regex("(\(weapon\))|empty-handed|finish taking off|finish putting on"):matches(crawl.messages(1)) == false 
-	or you.feel_safe()==false then
+	or you.feel_safe() == false then
 		return
 	end
 	basevalue = 15
@@ -150,14 +150,10 @@ function HitChance()
 	armour = you.skill("Armour")
 	e_rating = 0
 	a1 = items.equipped_at("Armour")
-	if (a1 == nil) == false then
+	if a1 then
 		e_rating = a1.encumbrance
 	end
 
-	a2 = items.equipped_at("Barding")
-	if (a2 == nil) == false then
-		e_rating = e_rating + a2.encumbrance
-	end
 	weapon = 0
 	accuracy = 0
 
@@ -178,6 +174,22 @@ function HitChance()
 
 	m_ch = mult_chances(m_ch, e_ch)
 
+	w = items.equipped_at("Shield")
+	if w then 
+		shields = you.skill("Shields")
+		size = 0
+		if you.race == "Spriggan" 								then size = 4 
+		elseif you.race == "Kobold" or you.race == "Halfling" 	then size = 2 
+		elseif you.race == "Centaur" or you.race == "Naga" 
+			or you.race == "Formicid" or you.race == "Ogre" 
+			or you.race == "Troll" then size = -2
+		end
+    ev_penalty = w.encumbrance
+    s_hit_penalty = ev_penalty - (shields)/(5 + size)
+    sh_ch = calc_chance_armour(s_hit_penalty)
+    m_ch = mult_chances(m_ch, sh_ch)
+	end
+
 	basevalue = basevalue + math.floor(dexterity/2) + accuracy
 	inc_v = inc_base(m_ch, basevalue)
 
@@ -188,8 +200,8 @@ function HitChance()
 
 	hit = more_or_equal(roll_c, ev_ch)
 	
-	w_name = "Claws"
+	w_name = "Unarmed"
 	if w then w_name = w.name() end
-	crawl.mpr("<lightcyan> Chance to hit with ".. w_name.." is "..tostring(math.floor(hit*100), 1).."%</lightcyan>")
+	crawl.mpr("<lightcyan>Chance to hit with ".. w_name.." is "..tostring(math.floor(hit*1000)/10).."%</lightcyan>")
 end
 }
