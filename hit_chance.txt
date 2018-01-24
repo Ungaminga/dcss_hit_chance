@@ -112,7 +112,9 @@ function calc_chance_armour(pen)
 
   ch = {}
   whole = math.floor(pen)
-  for i = 1, whole+1 do
+  step = 1
+  if whole+1 < 0 then step = -1 end
+  for i = 1, whole+1, step do
     if ch[-i] == nil then ch[-i] = 1 
     else ch[-i] =  ch[-i] + 1 end
   end
@@ -158,7 +160,8 @@ function HitChance()
   w = items.equipped_at("Weapon")
   if w == nil then
     weapon = you.skill("Unarmed")
-    accuracy = 2 --TODO: Claws
+    accuracy = 2
+    if you.has_claws() > 0 then accuracy = 4 end
   else
     weapon = you.skill(w.weap_skill)
     accuracy = w.accuracy + w.plus
@@ -176,11 +179,11 @@ function HitChance()
   if s then 
     shields = you.skill("Shields")
     size = 0
-    if you.race == "Spriggan"                 then size = 4 
-    elseif you.race == "Kobold" or you.race == "Halfling"   then size = 2 
-    elseif you.race == "Centaur" or you.race == "Naga" 
-      or you.race == "Formicid" or you.race == "Ogre" 
-      or you.race == "Troll" then size = -2
+    race = you.race()
+    if race == "Spriggan"                                         then size = 4 
+    elseif race == "Kobold" or race == "Halfling"                 then size = 2 
+    elseif race == "Centaur" or race == "Naga" 
+      or race == "Formicid" or race == "Ogre" or race == "Troll"  then size = -2
     end
     ev_penalty = s.encumbrance
     s_hit_penalty = ev_penalty - (shields)/(5 + size)
@@ -198,8 +201,10 @@ function HitChance()
 
   hit = more_or_equal(roll_c, ev_ch)
   
-  w_name = "Unarmed"
+  w_name = "fists"
+  if you.has_claws() > 0 then w_name = "claws" end
   if w then w_name = w.name() end
-  crawl.mpr("<lightcyan>Chance to hit with ".. w_name.." is "..tostring(math.floor(hit*1000)/10).."%</lightcyan>")
+  crawl.mpr("<lightcyan>Chance to hit with <yellow>".. w_name.."</yellow> is <yellow>"
+    ..tostring(math.floor(hit*1000)/10).."%</yellow></lightcyan>")
 end
 }
