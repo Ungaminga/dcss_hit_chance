@@ -7,9 +7,11 @@ Usage:
 
 * Add those lines to init.txt:
 ```
+{
 function ready()
   HitChance()
 end
+}
 ```
 
 You will get notice if you reequip yourself about your chance to hit. 
