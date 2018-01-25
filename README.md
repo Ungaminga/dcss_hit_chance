@@ -13,6 +13,7 @@ function ready()
 end
 }
 ```
+* For webtiles - copy whole [hit_chance.txt](hit_chance.txt) code into the `rc`.
 
 You will get notice if you reequip yourself about your chance to hit. 
 
