@@ -134,6 +134,22 @@ function calc_chance_armour(pen)
   return ch
 end
 
+local monsters = {["D:1"] = {"goblin", 12},
+                  ["D:2"] = {"adder", 15},
+                  ["D:3"] = {"orc wizard", 12},
+                  ["D:4"] = {"orc wizard", 12},
+                  ["D:5"] = {"bullfrog", 12},
+                  ["D:6"] = {"bullfrog", 12} }
+
+function try_get_ev(where)
+  r = {"goblin", 12}
+  if monsters[where] then 
+    r = monsters[where]
+  end
+
+  return r
+end
+
 function HitChance()
   if crawl.regex("(\(weapon\))|empty-handed|finish taking off|finish putting on"):matches(crawl.messages(1)) == false 
   or you.feel_safe() == false then
@@ -196,7 +212,7 @@ function HitChance()
 
   roll_c = roll_chance(inc_v)
 
-  ev = 12
+  ev = try_get_ev(you.where())[2]
   ev_ch = averge(mult_chances(calc_chance(2*ev), calc_chance(2*ev)))
 
   hit = more_or_equal(roll_c, ev_ch)
@@ -204,7 +220,7 @@ function HitChance()
   w_name = "fists"
   if you.has_claws() > 0 then w_name = "claws" end
   if w then w_name = w.name() end
-  crawl.mpr("<lightcyan>Chance to hit with <yellow>".. w_name.."</yellow> is <yellow>"
+  crawl.mpr("<lightcyan>Chance to hit <red>"..try_get_ev(you.where())[1].."</red> with <yellow>".. w_name.."</yellow> is <yellow>"
     ..tostring(math.floor(hit*1000)/10).."%</yellow></lightcyan>")
 end
 }
