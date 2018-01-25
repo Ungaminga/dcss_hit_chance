@@ -13,3 +13,6 @@ end
 ```
 
 You will get notice if you reequip yourself about your chance to hit. 
+
+
+Feel free to contribute some pull requests. I need some good data for `local monsters` variable, that calculates actual `EV` of monsters this dungeon level.
